@@ -7,22 +7,22 @@ import "fmt"
 type MovImm InstrFields
 
 func MovImm16(instr FetchedInstr) DecodedInstr {
-	raw_instr := instr.Uint32()
+    raw_instr := instr.Uint32()
 
-	Imm := raw_instr & 0xff
-	Rd := RegIndex((raw_instr >> 8) & 0x7)
+    Imm := raw_instr & 0xff
+    Rd := RegIndex((raw_instr >> 8) & 0x7)
 
-	return MovImm{Rd: Rd, Rm: 0, Rn: 0, Imm: Imm, setflags: NOT_IT}
+    return MovImm{Rd: Rd, Rm: 0, Rn: 0, Imm: Imm, setflags: NOT_IT}
 }
 
 func (instr MovImm) Execute(regs *Registers) {
-	value := instr.Imm
+    value := instr.Imm
 
-	MoveValue(regs, instr.Rd, value, instr.setflags, regs.Apsr.C)
+    MoveValue(regs, instr.Rd, value, instr.setflags, regs.Apsr.C)
 }
 
 func (instr MovImm) String() string {
-	return fmt.Sprintf("mov%s %s, #%#x", instr.setflags, instr.Rd, instr.Imm)
+    return fmt.Sprintf("mov%s %s, #%#x", instr.setflags, instr.Rd, instr.Imm)
 }
 
 /* MOV - Move (register)
@@ -31,29 +31,29 @@ func (instr MovImm) String() string {
 type MovRegT1 InstrFields
 
 func MovReg16T1(instr FetchedInstr) DecodedInstr {
-	raw_instr := instr.Uint32()
+    raw_instr := instr.Uint32()
 
-	Rd := uint8(raw_instr & 0x7)
-	Rm := RegIndex((raw_instr >> 3) & 0xf)
-	D := uint8((raw_instr >> 7) & 0x1)
+    Rd := uint8(raw_instr & 0x7)
+    Rm := RegIndex((raw_instr >> 3) & 0xf)
+    D := uint8((raw_instr >> 7) & 0x1)
 
-	d := RegIndex((D << 3) | Rd)
+    d := RegIndex((D << 3) | Rd)
 
-	return MovRegT1{Rd: d, Rm: Rm, Rn: 0, Imm: 0, setflags: NEVER}
+    return MovRegT1{Rd: d, Rm: Rm, Rn: 0, Imm: 0, setflags: NEVER}
 }
 
 func (instr MovRegT1) Execute(regs *Registers) {
-	if instr.Rd == 15 && regs.InITBlock() && !regs.LastInITBlock() {
-		// UNPREDICTABLE
-		// Raise exception (UsageFault?)
-		return
-	}
+    if instr.Rd == 15 && regs.InITBlock() && !regs.LastInITBlock() {
+        // UNPREDICTABLE
+        // Raise exception (UsageFault?)
+        return
+    }
 
-	MoveRegister(regs, instr.Rd, instr.Rm, instr.setflags, regs.Apsr.C)
+    MoveRegister(regs, instr.Rd, instr.Rm, instr.setflags, regs.Apsr.C)
 }
 
 func (instr MovRegT1) String() string {
-	return fmt.Sprintf("mov %s, %s", instr.Rd, instr.Rm)
+    return fmt.Sprintf("mov %s, %s", instr.Rd, instr.Rm)
 }
 
 /* MOV - Move (register)
@@ -62,24 +62,24 @@ func (instr MovRegT1) String() string {
 type MovRegT2 InstrFields
 
 func MovReg16T2(instr FetchedInstr) DecodedInstr {
-	raw_instr := instr.Uint32()
+    raw_instr := instr.Uint32()
 
-	Rd := RegIndex(raw_instr & 0x7)
-	Rm := RegIndex((raw_instr >> 3) & 0x7)
+    Rd := RegIndex(raw_instr & 0x7)
+    Rm := RegIndex((raw_instr >> 3) & 0x7)
 
-	return MovRegT2{Rd: Rd, Rm: Rm, Rn: 0, Imm: 0, setflags: ALWAYS}
+    return MovRegT2{Rd: Rd, Rm: Rm, Rn: 0, Imm: 0, setflags: ALWAYS}
 }
 
 func (instr MovRegT2) Execute(regs *Registers) {
-	if regs.InITBlock() {
-		// UNPREDICTABLE
-		// Raise exception (UsageFault?)
-		return
-	}
+    if regs.InITBlock() {
+        // UNPREDICTABLE
+        // Raise exception (UsageFault?)
+        return
+    }
 
-	MoveRegister(regs, instr.Rd, instr.Rm, instr.setflags, regs.Apsr.C)
+    MoveRegister(regs, instr.Rd, instr.Rm, instr.setflags, regs.Apsr.C)
 }
 
 func (instr MovRegT2) String() string {
-	return fmt.Sprintf("movs %s, %s", instr.Rd, instr.Rm)
+    return fmt.Sprintf("movs %s, %s", instr.Rd, instr.Rm)
 }

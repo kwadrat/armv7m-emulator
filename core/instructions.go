@@ -3,36 +3,36 @@ package core
 type DecodeFunc func(FetchedInstr) DecodedInstr
 
 type DecodedInstr interface {
-	Execute(*Registers)
+    Execute(*Registers)
 }
 
 type SetFlags uint8
 
 const (
-	ALWAYS SetFlags = iota
-	NEVER
-	NOT_IT // Only set condition codes if not in IT block
+    ALWAYS SetFlags = iota
+    NEVER
+    NOT_IT // Only set condition codes if not in IT block
 )
 
 func (setflags SetFlags) String() string {
-	if setflags == ALWAYS || setflags == NOT_IT {
-		return "s"
-	}
+    if setflags == ALWAYS || setflags == NOT_IT {
+        return "s"
+    }
 
-	return ""
+    return ""
 }
 
 func (setflags SetFlags) ShouldSetFlags(regs Registers) bool {
-	if setflags == ALWAYS || (setflags == NOT_IT && !regs.InITBlock()) {
-		return true
-	}
-	return false
+    if setflags == ALWAYS || (setflags == NOT_IT && !regs.InITBlock()) {
+        return true
+    }
+    return false
 }
 
 type InstrFields struct {
-	setflags SetFlags
-	Imm      uint32
-	Rd       RegIndex
-	Rm       RegIndex
-	Rn       RegIndex
+    setflags SetFlags
+    Imm      uint32
+    Rd       RegIndex
+    Rm       RegIndex
+    Rn       RegIndex
 }

@@ -7,30 +7,30 @@ import "fmt"
 type LslImm InstrFields
 
 func LslImm16(instr FetchedInstr) DecodedInstr {
-	raw_instr := instr.Uint32()
+    raw_instr := instr.Uint32()
 
-	Rd := RegIndex(raw_instr & 0x7)
-	Rm := RegIndex((raw_instr >> 3) & 0x7)
-	Imm := (raw_instr >> 6) & 0x1f
+    Rd := RegIndex(raw_instr & 0x7)
+    Rm := RegIndex((raw_instr >> 3) & 0x7)
+    Imm := (raw_instr >> 6) & 0x1f
 
-	if Imm == 0 {
-		/* Equivalent to MOV (reg) T2 encoding */
-		return MovReg16T2(instr)
-	}
+    if Imm == 0 {
+        /* Equivalent to MOV (reg) T2 encoding */
+        return MovReg16T2(instr)
+    }
 
-	return LslImm{Rd: Rd, Rm: Rm, Rn: 0, Imm: Imm, setflags: NOT_IT}
+    return LslImm{Rd: Rd, Rm: Rm, Rn: 0, Imm: Imm, setflags: NOT_IT}
 }
 
 func (instr LslImm) Execute(regs *Registers) {
-	value := regs.R(instr.Rm)
-	shift_n := uint8(instr.Imm)
+    value := regs.R(instr.Rm)
+    shift_n := uint8(instr.Imm)
 
-	result := LSL(regs, value, shift_n, instr.setflags)
-	regs.SetR(instr.Rd, result)
+    result := LSL(regs, value, shift_n, instr.setflags)
+    regs.SetR(instr.Rd, result)
 }
 
 func (instr LslImm) String() string {
-	return fmt.Sprintf("lsl%s %s, %s, #%d", instr.setflags, instr.Rd, instr.Rm, instr.Imm)
+    return fmt.Sprintf("lsl%s %s, %s, #%d", instr.setflags, instr.Rd, instr.Rm, instr.Imm)
 }
 
 /* LSL - Logical Shift Left (register)
@@ -38,24 +38,24 @@ func (instr LslImm) String() string {
 type LslReg InstrFields
 
 func LslReg16(instr FetchedInstr) DecodedInstr {
-	raw_instr := instr.Uint32()
+    raw_instr := instr.Uint32()
 
-	Rdn := RegIndex(raw_instr & 0x7)
-	Rm := RegIndex((raw_instr >> 3) & 0x7)
+    Rdn := RegIndex(raw_instr & 0x7)
+    Rm := RegIndex((raw_instr >> 3) & 0x7)
 
-	return LslReg{Rd: Rdn, Rn: Rdn, Rm: Rm, Imm: 0, setflags: NOT_IT}
+    return LslReg{Rd: Rdn, Rn: Rdn, Rm: Rm, Imm: 0, setflags: NOT_IT}
 }
 
 func (instr LslReg) Execute(regs *Registers) {
-	value := regs.R(instr.Rn)
-	shift_n := uint8(regs.R(instr.Rm))
+    value := regs.R(instr.Rn)
+    shift_n := uint8(regs.R(instr.Rm))
 
-	result := LSL(regs, value, shift_n, instr.setflags)
-	regs.SetR(instr.Rd, result)
+    result := LSL(regs, value, shift_n, instr.setflags)
+    regs.SetR(instr.Rd, result)
 }
 
 func (instr LslReg) String() string {
-	return fmt.Sprintf("lsl%s %s, %s", instr.setflags, instr.Rd, instr.Rm)
+    return fmt.Sprintf("lsl%s %s, %s", instr.setflags, instr.Rd, instr.Rm)
 }
 
 /* LSR - Logical Shift Right (immediate)
@@ -63,25 +63,25 @@ func (instr LslReg) String() string {
 type LsrImm InstrFields
 
 func LsrImm16(instr FetchedInstr) DecodedInstr {
-	raw_instr := instr.Uint32()
+    raw_instr := instr.Uint32()
 
-	Rd := RegIndex(raw_instr & 0x7)
-	Rm := RegIndex((raw_instr >> 3) & 0x7)
-	Imm := (raw_instr >> 6) & 0x1f
+    Rd := RegIndex(raw_instr & 0x7)
+    Rm := RegIndex((raw_instr >> 3) & 0x7)
+    Imm := (raw_instr >> 6) & 0x1f
 
-	return LsrImm{Rd: Rd, Rm: Rm, Rn: 0, Imm: Imm, setflags: NOT_IT}
+    return LsrImm{Rd: Rd, Rm: Rm, Rn: 0, Imm: Imm, setflags: NOT_IT}
 }
 
 func (instr LsrImm) Execute(regs *Registers) {
-	value := regs.R(instr.Rm)
-	shift_n := uint8(instr.Imm)
+    value := regs.R(instr.Rm)
+    shift_n := uint8(instr.Imm)
 
-	result := LSR(regs, value, shift_n, instr.setflags)
-	regs.SetR(instr.Rd, result)
+    result := LSR(regs, value, shift_n, instr.setflags)
+    regs.SetR(instr.Rd, result)
 }
 
 func (instr LsrImm) String() string {
-	return fmt.Sprintf("lsr%s %s, %s, #%d", instr.setflags, instr.Rd, instr.Rm, instr.Imm)
+    return fmt.Sprintf("lsr%s %s, %s, #%d", instr.setflags, instr.Rd, instr.Rm, instr.Imm)
 }
 
 /* LSR - Logical Shift Right (register)
@@ -89,24 +89,24 @@ func (instr LsrImm) String() string {
 type LsrReg InstrFields
 
 func LsrReg16(instr FetchedInstr) DecodedInstr {
-	raw_instr := instr.Uint32()
+    raw_instr := instr.Uint32()
 
-	Rdn := RegIndex(raw_instr & 0x7)
-	Rm := RegIndex((raw_instr >> 3) & 0x7)
+    Rdn := RegIndex(raw_instr & 0x7)
+    Rm := RegIndex((raw_instr >> 3) & 0x7)
 
-	return LsrReg{Rd: Rdn, Rn: Rdn, Rm: Rm, Imm: 0, setflags: NOT_IT}
+    return LsrReg{Rd: Rdn, Rn: Rdn, Rm: Rm, Imm: 0, setflags: NOT_IT}
 }
 
 func (instr LsrReg) Execute(regs *Registers) {
-	value := regs.R(instr.Rn)
-	shift_n := uint8(regs.R(instr.Rm))
+    value := regs.R(instr.Rn)
+    shift_n := uint8(regs.R(instr.Rm))
 
-	result := LSR(regs, value, shift_n, instr.setflags)
-	regs.SetR(instr.Rd, result)
+    result := LSR(regs, value, shift_n, instr.setflags)
+    regs.SetR(instr.Rd, result)
 }
 
 func (instr LsrReg) String() string {
-	return fmt.Sprintf("lsr%s %s, %s", instr.setflags, instr.Rd, instr.Rm)
+    return fmt.Sprintf("lsr%s %s, %s", instr.setflags, instr.Rd, instr.Rm)
 }
 
 /* ASR - Arithmetic Shift Right (immediate)
@@ -114,27 +114,27 @@ func (instr LsrReg) String() string {
 type AsrImm InstrFields
 
 func AsrImm16(instr FetchedInstr) DecodedInstr {
-	raw_instr := instr.Uint32()
+    raw_instr := instr.Uint32()
 
-	Rd := RegIndex(raw_instr & 0x7)
-	Rm := RegIndex((raw_instr >> 3) & 0x7)
-	Imm := (raw_instr >> 6) & 0x1f
+    Rd := RegIndex(raw_instr & 0x7)
+    Rm := RegIndex((raw_instr >> 3) & 0x7)
+    Imm := (raw_instr >> 6) & 0x1f
 
-	if Imm == 0 {
-		Imm = 32
-	}
+    if Imm == 0 {
+        Imm = 32
+    }
 
-	return AsrImm{Rd: Rd, Rn: 0, Rm: Rm, Imm: Imm, setflags: NOT_IT}
+    return AsrImm{Rd: Rd, Rn: 0, Rm: Rm, Imm: Imm, setflags: NOT_IT}
 }
 
 func (instr AsrImm) Execute(regs *Registers) {
-	value := regs.R(instr.Rm)
-	shift_n := uint8(instr.Imm)
+    value := regs.R(instr.Rm)
+    shift_n := uint8(instr.Imm)
 
-	result := ASR(regs, value, shift_n, instr.setflags)
-	regs.SetR(instr.Rd, result)
+    result := ASR(regs, value, shift_n, instr.setflags)
+    regs.SetR(instr.Rd, result)
 }
 
 func (instr AsrImm) String() string {
-	return fmt.Sprintf("asr%s %s, %s, #%d", instr.setflags, instr.Rd, instr.Rm, instr.Imm)
+    return fmt.Sprintf("asr%s %s, %s, #%d", instr.setflags, instr.Rd, instr.Rm, instr.Imm)
 }

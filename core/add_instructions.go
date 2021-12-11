@@ -8,21 +8,21 @@ import "fmt"
 type AddRegT1 InstrFields
 
 func AddReg16T1(instr FetchedInstr) DecodedInstr {
-	raw_instr := instr.Uint32()
+    raw_instr := instr.Uint32()
 
-	Rd := RegIndex(raw_instr & 0x7)
-	Rn := RegIndex((raw_instr >> 3) & 0x7)
-	Rm := RegIndex((raw_instr >> 6) & 0x7)
+    Rd := RegIndex(raw_instr & 0x7)
+    Rn := RegIndex((raw_instr >> 3) & 0x7)
+    Rm := RegIndex((raw_instr >> 6) & 0x7)
 
-	return AddRegT1{Rd: Rd, Rm: Rm, Rn: Rn, Imm: 0, setflags: NOT_IT}
+    return AddRegT1{Rd: Rd, Rm: Rm, Rn: Rn, Imm: 0, setflags: NOT_IT}
 }
 
 func (instr AddRegT1) Execute(regs *Registers) {
-	AddRegister(regs, InstrFields(instr), Shift{function: LSL_C, amount: 0})
+    AddRegister(regs, InstrFields(instr), Shift{function: LSL_C, amount: 0})
 }
 
 func (instr AddRegT1) String() string {
-	return fmt.Sprintf("adds %s, %s, %s", instr.Rd, instr.Rn, instr.Rm)
+    return fmt.Sprintf("adds %s, %s, %s", instr.Rd, instr.Rn, instr.Rm)
 }
 
 /* ADD (register)
@@ -31,40 +31,40 @@ func (instr AddRegT1) String() string {
 type AddRegT2 InstrFields
 
 func AddReg16T2(instr FetchedInstr) DecodedInstr {
-	raw_instr := instr.Uint32()
+    raw_instr := instr.Uint32()
 
-	rdn := uint8(raw_instr & 0x7)
-	DN := uint8((raw_instr >> 7) & 0x1)
-	Rdn := RegIndex((DN << 3) | rdn)
-	Rm := RegIndex((raw_instr >> 3) & 0xf)
+    rdn := uint8(raw_instr & 0x7)
+    DN := uint8((raw_instr >> 7) & 0x1)
+    Rdn := RegIndex((DN << 3) | rdn)
+    Rm := RegIndex((raw_instr >> 3) & 0xf)
 
-	if Rm == SP {
-		return AddRegSP16T1(instr)
-	}
+    if Rm == SP {
+        return AddRegSP16T1(instr)
+    }
 
-	if Rdn == SP {
-		return AddRegSP16T2(instr)
-	}
+    if Rdn == SP {
+        return AddRegSP16T2(instr)
+    }
 
-	return AddRegT2{Rd: Rdn, Rm: Rm, Rn: Rdn, Imm: 0, setflags: NEVER}
+    return AddRegT2{Rd: Rdn, Rm: Rm, Rn: Rdn, Imm: 0, setflags: NEVER}
 }
 
 func (instr AddRegT2) Execute(regs *Registers) {
-	if instr.Rd == PC && regs.InITBlock() && !regs.LastInITBlock() {
-		// UNPREDICTABLE
-		// Raise exception (UsageFault?)
-		return
-	} else if instr.Rd == PC && instr.Rm == PC {
-		// UNPREDICTABLE
-		// Raise exception (UsageFault?)
-		return
-	}
+    if instr.Rd == PC && regs.InITBlock() && !regs.LastInITBlock() {
+        // UNPREDICTABLE
+        // Raise exception (UsageFault?)
+        return
+    } else if instr.Rd == PC && instr.Rm == PC {
+        // UNPREDICTABLE
+        // Raise exception (UsageFault?)
+        return
+    }
 
-	AddRegister(regs, InstrFields(instr), Shift{function: LSL_C, amount: 0})
+    AddRegister(regs, InstrFields(instr), Shift{function: LSL_C, amount: 0})
 }
 
 func (instr AddRegT2) String() string {
-	return fmt.Sprintf("add %s, %s", instr.Rd, instr.Rm)
+    return fmt.Sprintf("add %s, %s", instr.Rd, instr.Rm)
 }
 
 /* ADD (SP plus register)
@@ -73,22 +73,22 @@ func (instr AddRegT2) String() string {
 type AddRegSPT1 InstrFields
 
 func AddRegSP16T1(instr FetchedInstr) DecodedInstr {
-	raw_instr := instr.Uint32()
+    raw_instr := instr.Uint32()
 
-	rdm := uint8(raw_instr & 0x7)
-	DM := uint8((raw_instr >> 7) & 0x1)
+    rdm := uint8(raw_instr & 0x7)
+    DM := uint8((raw_instr >> 7) & 0x1)
 
-	Rdm := RegIndex((DM << 3) | rdm)
+    Rdm := RegIndex((DM << 3) | rdm)
 
-	return AddRegSPT1{Rd: Rdm, Rm: Rdm, Rn: SP, Imm: 0, setflags: NEVER}
+    return AddRegSPT1{Rd: Rdm, Rm: Rdm, Rn: SP, Imm: 0, setflags: NEVER}
 }
 
 func (instr AddRegSPT1) Execute(regs *Registers) {
-	AddRegister(regs, InstrFields(instr), Shift{function: LSL_C, amount: 0})
+    AddRegister(regs, InstrFields(instr), Shift{function: LSL_C, amount: 0})
 }
 
 func (instr AddRegSPT1) String() string {
-	return fmt.Sprintf("add %s, sp, %s", instr.Rd, instr.Rd)
+    return fmt.Sprintf("add %s, sp, %s", instr.Rd, instr.Rd)
 }
 
 /* ADD (SP plus register)
@@ -97,23 +97,23 @@ func (instr AddRegSPT1) String() string {
 type AddRegSPT2 InstrFields
 
 func AddRegSP16T2(instr FetchedInstr) DecodedInstr {
-	raw_instr := instr.Uint32()
+    raw_instr := instr.Uint32()
 
-	Rm := RegIndex((raw_instr >> 3) & 0xf)
+    Rm := RegIndex((raw_instr >> 3) & 0xf)
 
-	if Rm == SP {
-		return AddRegSP16T1(instr)
-	}
+    if Rm == SP {
+        return AddRegSP16T1(instr)
+    }
 
-	return AddRegSPT2{Rd: SP, Rm: Rm, Rn: SP, Imm: 0, setflags: NEVER}
+    return AddRegSPT2{Rd: SP, Rm: Rm, Rn: SP, Imm: 0, setflags: NEVER}
 }
 
 func (instr AddRegSPT2) Execute(regs *Registers) {
-	AddRegister(regs, InstrFields(instr), Shift{function: LSL_C, amount: 0})
+    AddRegister(regs, InstrFields(instr), Shift{function: LSL_C, amount: 0})
 }
 
 func (instr AddRegSPT2) String() string {
-	return fmt.Sprintf("add sp, %s", instr.Rm)
+    return fmt.Sprintf("add sp, %s", instr.Rm)
 }
 
 /* ADD (immediate)
@@ -122,21 +122,21 @@ func (instr AddRegSPT2) String() string {
 type AddImmT1 InstrFields
 
 func AddImm16T1(instr FetchedInstr) DecodedInstr {
-	raw_instr := instr.Uint32()
+    raw_instr := instr.Uint32()
 
-	Rd := RegIndex(raw_instr & 0x7)
-	Rn := RegIndex((raw_instr >> 3) & 0x7)
-	Imm := uint32((raw_instr >> 6) & 0x7)
+    Rd := RegIndex(raw_instr & 0x7)
+    Rn := RegIndex((raw_instr >> 3) & 0x7)
+    Imm := uint32((raw_instr >> 6) & 0x7)
 
-	return AddImmT1{Rd: Rd, Rm: 0, Rn: Rn, Imm: Imm, setflags: NOT_IT}
+    return AddImmT1{Rd: Rd, Rm: 0, Rn: Rn, Imm: Imm, setflags: NOT_IT}
 }
 
 func (instr AddImmT1) Execute(regs *Registers) {
-	AddImmediate(regs, InstrFields(instr))
+    AddImmediate(regs, InstrFields(instr))
 }
 
 func (instr AddImmT1) String() string {
-	return fmt.Sprintf("adds %s, %s, #%d", instr.Rd, instr.Rn, instr.Imm)
+    return fmt.Sprintf("adds %s, %s, #%d", instr.Rd, instr.Rn, instr.Imm)
 }
 
 /* ADD (immediate)
@@ -145,20 +145,20 @@ func (instr AddImmT1) String() string {
 type AddImmT2 InstrFields
 
 func AddImm16T2(instr FetchedInstr) DecodedInstr {
-	raw_instr := instr.Uint32()
+    raw_instr := instr.Uint32()
 
-	Imm := uint32(raw_instr & 0xff)
-	Rdn := RegIndex((raw_instr >> 8) & 0x7)
+    Imm := uint32(raw_instr & 0xff)
+    Rdn := RegIndex((raw_instr >> 8) & 0x7)
 
-	return AddImmT2{Rd: Rdn, Rm: 0, Rn: Rdn, Imm: Imm, setflags: NOT_IT}
+    return AddImmT2{Rd: Rdn, Rm: 0, Rn: Rdn, Imm: Imm, setflags: NOT_IT}
 }
 
 func (instr AddImmT2) Execute(regs *Registers) {
-	AddImmediate(regs, InstrFields(instr))
+    AddImmediate(regs, InstrFields(instr))
 }
 
 func (instr AddImmT2) String() string {
-	return fmt.Sprintf("adds %s, #%d", instr.Rd, instr.Imm)
+    return fmt.Sprintf("adds %s, #%d", instr.Rd, instr.Imm)
 }
 
 /* SUB (register)
@@ -167,19 +167,19 @@ func (instr AddImmT2) String() string {
 type SubRegT1 InstrFields
 
 func SubReg16T1(instr FetchedInstr) DecodedInstr {
-	raw_instr := instr.Uint32()
+    raw_instr := instr.Uint32()
 
-	Rd := RegIndex(raw_instr & 0x7)
-	Rn := RegIndex((raw_instr >> 3) & 0x7)
-	Rm := RegIndex((raw_instr >> 6) & 0x7)
+    Rd := RegIndex(raw_instr & 0x7)
+    Rn := RegIndex((raw_instr >> 3) & 0x7)
+    Rm := RegIndex((raw_instr >> 6) & 0x7)
 
-	return SubRegT1{Rd: Rd, Rm: Rm, Rn: Rn, Imm: 0, setflags: NOT_IT}
+    return SubRegT1{Rd: Rd, Rm: Rm, Rn: Rn, Imm: 0, setflags: NOT_IT}
 }
 
 func (instr SubRegT1) Execute(regs *Registers) {
-	SubRegister(regs, InstrFields(instr), Shift{function: LSL_C, amount: 0})
+    SubRegister(regs, InstrFields(instr), Shift{function: LSL_C, amount: 0})
 }
 
 func (instr SubRegT1) String() string {
-	return fmt.Sprintf("subs %s, %s, %s", instr.Rd, instr.Rm, instr.Rn)
+    return fmt.Sprintf("subs %s, %s, %s", instr.Rd, instr.Rm, instr.Rn)
 }
